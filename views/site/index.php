@@ -6,6 +6,30 @@ use yii\web\View;
 $this->title = 'My Yii Application';
 
 View::registerCssFile('@web/css/style.css');
+// $userData = $this->registerJs("$('#submit_button').on('click', function( event ) {
+//   var array = [
+//     $('#login').val(),
+//     $('#password').val(),
+//   ];
+//   console.log(array);
+//  return array;
+// })");
+$jsFunctionResult = $this->registerJs("$('#submit_button').on('click', function( event ) {
+    var array = [
+      $('#login').val(),
+      $('#password').val(),
+    ];
+   $.ajax({
+    url: '/site-controller/add-user',
+    method: 'POST',
+    data: {
+        data: array
+    },
+    success: function(response) {
+        console.log(response);
+    }
+    });
+   })");
 ?>
 <div class="form_wrapper">
   <div class="form_container">
@@ -16,15 +40,15 @@ View::registerCssFile('@web/css/style.css');
       <div class="">
         <form>
           <div class="input_field"> <span><i aria-hidden="true" class="fa fa-envelope"></i></span>
-            <input type="text" name="login" placeholder="Login" required />
+            <input  id="login" type="text" name="login" placeholder="Login" required />
           </div>
           <div class="input_field"> <span><i aria-hidden="true" class="fa fa-lock"></i></span>
-            <input type="password" name="password" placeholder="Password" required />
+            <input  id="password" type="password" name="password" placeholder="Password" required />
           </div>
           <div class="input_field"> <span><i aria-hidden="true" class="fa fa-lock"></i></span>
             <input type="password" name="password" placeholder="Re-type Password" required />
           </div>
-          <input class="button" type="submit" value="Register" />
+          <input id="submit_button" class="button" type="submit" value="Register" />
         </form>
       </div>
     </div>

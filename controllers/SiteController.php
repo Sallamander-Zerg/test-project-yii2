@@ -61,11 +61,19 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $model = new User();
+        $model = new \app\models\User();
         
-        return $this->render('index', [
-            'model' => $model,
-        ]);
+        return $this->render('index');
+    }
+
+    /**
+     * Displays homepage.
+     *
+     * @return string
+     */
+    public function actionAddUser()
+    {
+        print_r($data);
     }
 
     /**

@@ -52,7 +52,8 @@ class User extends \yii\db\ActiveRecord
      */
     public function addNewUser($data)
     {
-        $data['password'] = Yii::$app->security->generatePasswordHash(  $data['password']);
+        print_r($data);
+        $data['password'] = Yii::$app->security->generatePasswordHash($data['password']);
         $model = new static();
         $model->setAttributes($data);
         
