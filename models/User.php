@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $pasword
+ * @property string $status
  *
  * @property UserRules[] $userRules
  */
@@ -29,8 +30,8 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'pasword'], 'required'],
-            [['name', 'pasword'], 'string', 'max' => 255],
+            [['name', 'pasword', 'status'], 'required'],
+            [['name', 'pasword', 'status'], 'string', 'max' => 255],
         ];
     }
 
@@ -43,23 +44,89 @@ class User extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'pasword' => 'Pasword',
+            'status' => 'Status',
         ];
     }
-
-    /**
-     * Записывает данные в таблицу report_stock_history
-     * @return int Количество сохраненных строк
-     */
-    public function addNewUser($data)
+    /** 
+    * добавляет виртуальный атрибут
+    */
+    public function getRole()
     {
-        print_r($data);
-        $data['password'] = Yii::$app->security->generatePasswordHash($data['password']);
-        $model = new static();
-        $model->setAttributes($data);
-        
-        return $model->save();
-        
+        return $this->role;
     }
+
+    public function setRole($value)
+    {
+        $this->role = $value;
+    }
+
+    /** 
+    * добавляет нового пользователя
+    */
+   public function addNewUser($data)
+   {    
+            $this->name = $data['name'];
+            $this->pasword = Yii::$app->security->generatePasswordHash($data['pasword']);
+            $this->status = 'работает';
+        if($this->save()){
+            $role = Roles::find()->where(['role'=>$data['role']])->scalar();
+            $model = new UserRules();
+            $model->user_id = $this->id;
+            $model->role_id = $role;
+            return $model->save(); 
+        }else{
+            return false;
+        }
+   }
+   /** 
+    * проверяет данные пользователя при входе
+    */
+   public function Login($name)
+    {
+         $userData = $this::find()
+         ->joinWith([
+            'userRules'
+         ])
+         ->where([
+            'name'=>$name
+         ])
+         ->asArray()
+         ->all();
+
+        $role = Roles::find()
+        ->select([
+            'role'
+        ])
+        ->where([
+            'id'=>$userData[0]['userRules'][0]['role_id']
+         ])
+         ->asArray()
+         ->scalar();
+         $userData[0]['userRules']=$role;
+         return $userData;
+    }
+
+    /** 
+    * добавляет нового пользователя
+    */
+    public function editUserData($name)
+    {
+         $userData = User::find()
+         ->where([
+            'name'=>$name
+         ])
+         ->all();
+         return $userData;
+    }
+
+    /** 
+    * добавляет нового пользователя
+    */
+   public function getAllUser($name)
+   {
+        $usersData = User::find()->where(['<>','name',$name])->all();
+        return $usersData;
+   }
 
     /**
      * Gets query for [[UserRules]].

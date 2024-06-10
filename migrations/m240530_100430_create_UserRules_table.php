@@ -55,6 +55,14 @@ class m240530_100430_create_UserRules_table extends Migration
             'id',
             'CASCADE'
         );
+
+        $this->insert('{{%roles}}', [
+            'role' => 'admin',
+        ]);
+
+        $this->insert('{{%roles}}', [
+            'role' => 'engineer',
+        ]);
     }
 
     /**
